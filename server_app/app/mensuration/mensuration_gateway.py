@@ -8,7 +8,7 @@ from app.mensuration.mensuration_controller import MensurationController
 mensuration = Blueprint('mensuration', __name__, url_prefix='/mensuration')
 
 
-@mensuration.route('/getFrequencyPerMonth', methods=['GET'])
+@mensuration.route('/getFrequencyPerYear', methods=['GET'])
 def getFrequencyPerYear():
     mensurationController = MensurationController()
     response = mensurationController.getFrequencyPerYear()

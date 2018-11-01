@@ -3,7 +3,7 @@ from app.station.station import Station
 from app.mensuration.mensuration import Mensuration
 from config import PATH_MENSURATIONS_FILES
 
-from sqlalchemy import func, extract, desc
+from sqlalchemy import func
 
 import pandas as pd
 import datetime
@@ -31,13 +31,14 @@ class MensurationController:
                 mensuration = Mensuration(station=station, source='INMET', date=datetime.date(int(year), int(month), int(day)), tempMax=tempMax, tempMin=tempMin, tempAvg=tempAvg,
                                           evp=evp, prec=prec, insolation=insolation, humidity=humidity)
                 session.add(mensuration)
-                session.commit()
+
+            session.commit()
 
 
     def getFrequencyPerYear(self):
         mensurationPerYear = session\
             .query(Mensuration.station.label('station'), func.date_part('year', Mensuration.date).label('year'), func.count(func.date_part('year', Mensuration.date)))\
-            .group_by(Mensuration.station, func.date_part('year', Mensuration.date))\
+            .group_by('station', func.date_part('year', Mensuration.date))\
             .order_by('year')\
             .all()\
 
@@ -47,6 +48,8 @@ class MensurationController:
                 .order_by('station')\
                 .all()\
 
+
+
         response = []
         for row in mensurationPerYear:
             for row_2 in totals:
@@ -54,11 +57,15 @@ class MensurationController:
                     total = row_2[1]
                     break
 
+            station = session.query(Station).filter(Station.omm==row[0]).first()
+
             response.append({
-                'station': str(row[0]),
+                'omm': str(row[0]),
+                'name': station.name,
                 'year': int(row[1]),
                 'frequency': int(row[2]),
-                'total': int(total)
+                'total': int(total),
+                'start': str(station.start)
             })
 
         return response

@@ -30,13 +30,13 @@ base.metadata.create_all(db)
 Session = sessionmaker(db)
 session = Session()
 
-# from app.mensuration.mensuration_controller import MensurationController
-# mensurationController = MensurationController()
-# mensurationController.storeMensurations()
-
 # from app.station.station_controller import StationController
 # stationController = StationController()
 # stationController.storeStationsDB()
+
+# from app.mensuration.mensuration_controller import MensurationController
+# mensurationController = MensurationController()
+# mensurationController.storeMensurations()
 
 # Register blueprint(s)
 from app.mensuration.mensuration_gateway import mensuration
