@@ -148,7 +148,7 @@
             var t = svg.transition().duration(1000);
             render(t);
           } else if (this.value == 'byYearDesc') {
-            var sorted = data.sort((a, b) => d3.ascending(a.year, b.year) || d3.ascending(a.omm, b.omm)) || d3.descending(a.total, b.total);
+            var sorted = data.sort((a, b) => d3.descending(a.year, b.year) || d3.ascending(a.omm, b.omm)) || d3.descending(a.total, b.total);
             var y_elements_sorted = d3.set(sorted.map(( item ) => item.year)).values();
 
             yScale.domain(y_elements_sorted);
