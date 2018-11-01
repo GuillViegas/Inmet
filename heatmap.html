@@ -190,6 +190,11 @@
         }
 
         var render = (t) => {
+          t.selec(".y.axis")
+            .call(yAxis)
+            .selectAll('text')
+            .attr('font-weight', 'normal');
+
           t.select(".x.axis")
             .call(xAxis)
             .selectAll('text')
