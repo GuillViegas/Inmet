@@ -15,10 +15,6 @@
 </style>
 
 <div class="heatmap"></div>
-<!-- <select id="options">
-  <option value="byStartOperationDate">Início das Operações</option>
-  <option value="byNumMensurements">Número de medições</option>
-</select> -->
 
 <script src="d3.v5.min.js"></script>
 
@@ -102,24 +98,37 @@
             .attr("dy", ".5em")
             .attr("transform", (d) => "rotate(-65)");
 
-        var select = d3.select('body')
+        var select_xAxis = d3.select('body')
             .append('select')
-            .attr('class','select')
+            .attr('class','xAxis')
             .on('change',onchange)
 
-        select.append('option')
+        select_xAxis.append('option')
               .attr('value','byStations')
               .text('Estações')
 
-        select.append('option')
+        select_xAxis.append('option')
               .attr('value','byNumMensurements')
               .text('Ordenar por número de registros')
 
-        select.append('option')
+        select_xAxis.append('option')
               .attr('value','byStartOperationDate')
               .text('Início das Operações')
 
-        select.append('option')
+        var select_yAxis = d3.select('body')
+            .append('select')
+            .attr('class','yAxis')
+            .on('change',onchange)
+
+        select_yAxis.append('option')
+              .attr('value','byYearAsc')
+              .text('Ano ascendente')
+
+        select_yAxis.append('option')
+              .attr('value','byYearDesc')
+              .text('Ano descendente')
+
+        select_yAxis.append('option')
               .attr('value','byFrequencyByYear')
               .text('Número de registros por ano')
 
@@ -128,13 +137,24 @@
             byNumMensurementsFunc();
           } else if (this.value == 'byStations'){
             xScale.domain(x_elements);
-
           var t = svg.transition().duration(1000);
           render(t);
           } else if (this.value == 'byStartOperationDate'){
             byStartOperationDateFunc();
           } else if (this.value == 'byFrequencyByYear'){
             byFrequencyByYearFunc();
+          } else if (this.value == 'byYearAsc'){
+            yScale.domain(y_elements);
+            var t = svg.transition().duration(1000);
+            render(t);
+          } else if (this.value == 'byYearDesc') {
+            var sorted = data.sort((a, b) => d3.ascending(a.year, b.year) || d3.ascending(a.omm, b.omm)) || d3.descending(a.total, b.total);
+            var y_elements_sorted = d3.set(sorted.map(( item ) => item.year)).values();
+
+            yScale.domain(x_elements_sorted);
+
+            var t = svg.transition().duration(1000);
+            render(t);
           }
         }
 
