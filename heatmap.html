@@ -119,6 +119,10 @@
               .attr('value','byStartOperationDate')
               .text('Início das Operações')
 
+        select.append('option')
+              .attr('value','byFrequencyByYear')
+              .text('Número de registros por ano')
+
         function onchange() {
           if(this.value == 'byNumMensurements'){
             byNumMensurementsFunc();
@@ -129,6 +133,8 @@
           render(t);
           } else if (this.value == 'byStartOperationDate'){
             byStartOperationDateFunc();
+          } else if (this.value == 'byFrequencyByYear'){
+            byFrequencyByYearFunc();
           }
         }
 
@@ -150,6 +156,17 @@
 
           var t = svg.transition().duration(1000);
           render(t);
+        }
+
+        var byFrequencyByYearFunc = () => {
+          Promise.resolve(d3.json("https://guillviegas.github.io/inmet/frequencyByYear.json")).then((response) =>{
+            var y_elements_sorted = d3.set(response.map(( item ) => item.year)).values();
+
+            yScale.domain(y_elements_sorted);
+
+            var t = svg.transition().duration(1000);
+            render(t);
+          })
         }
 
         var render = (t) => {
