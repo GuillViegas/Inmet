@@ -25,16 +25,28 @@
 <script>
     var itemSize = 10, 
         cellSize = itemSize - 1, 
-        margin = {top: 40, right: 20, bottom: 20, left: 35};
+        margin = {top: 200, right: 20, bottom: 20, left: 35};
           
-    var width = 2700 - margin.right - margin.left,
-        height = 615 - margin.top - margin.bottom;
+    var width = 2750 - margin.right - margin.left,
+        height = 800 - margin.top - margin.bottom;
 
-    Promise.resolve(d3.json("http://localhost:5000/mensuration/getFrequencyPerMonth")).then((response) => {
-        var data = response;
-        console.log(data);
+    Promise.resolve(d3.json("https://guillviegas.github.io/inmet/stations.json")).then((response) => {
+        var data = [];
 
-        var x_elements = d3.set(data.map(( item ) => item.station)).values();
+        response.map((station) => 
+          data.push({
+              "name": station.name,
+              "omm": station.omm,
+              "start": new Date(station.start),
+              "frequency": station.frequency,
+              "year": station.year,
+              "total": station.total
+          })
+        );
+
+        
+
+        var x_elements = d3.set(data.map(( item ) => item.name )).values();
         var y_elements = d3.set(data.map(( item ) => item.year )).values();
 
         var xScale = d3.scaleBand()
@@ -70,7 +82,7 @@
             .attr('height', cellSize)
             .attr('y', (d) => yScale(d.year))
             .attr("ry", 2)
-            .attr('x', (d) => xScale(d.station))
+            .attr('x', (d) => xScale(d.name))
             .attr("rx", 2)
             .attr('fill', (d) => colorScale(d.frequency));
 
@@ -103,6 +115,10 @@
               .attr('value','byNumMensurements')
               .text('Ordenar por número de registros')
 
+        select.append('option')
+              .attr('value','byStartOperationDate')
+              .text('Início das Operações')
+
         function onchange() {
           if(this.value == 'byNumMensurements'){
             byNumMensurementsFunc();
@@ -111,12 +127,24 @@
 
           var t = svg.transition().duration(1000);
           render(t);
+          } else if (this.value == 'byStartOperationDate'){
+            byStartOperationDateFunc();
           }
         }
 
         var byNumMensurementsFunc = () => {
-          var sorted = data.sort((a, b) => d3.descending(a.total, b.total) || d3.ascending(a.year, b.year) || d3.ascending(a.station, b.station));
-          var x_elements_sorted = d3.set(sorted.map(( item ) => item.station)).values();
+          var sorted = data.sort((a, b) => d3.descending(a.total, b.total) || d3.ascending(a.year, b.year) || d3.ascending(a.omm, b.omm));
+          var x_elements_sorted = d3.set(sorted.map(( item ) => item.name)).values();
+
+          xScale.domain(x_elements_sorted);
+
+          var t = svg.transition().duration(1000);
+          render(t);
+        }
+
+        var byStartOperationDateFunc = () => {
+          var sorted = data.sort((a, b) => d3.ascending(a.start, b.start) || d3.ascending(a.year, b.year) || d3.ascending(a.omm, b.omm));
+          var x_elements_sorted = d3.set(sorted.map(( item ) => item.name)).values();
 
           xScale.domain(x_elements_sorted);
 
@@ -139,7 +167,7 @@
             .attr('height', cellSize)
             .attr('y', (d) => yScale(d.year))
             .attr("ry", 2)
-            .attr('x', (d) => xScale(d.station))
+            .attr('x', (d) => xScale(d.name))
             .attr("rx", 2)
             .attr('fill', (d) => colorScale(d.frequency));
         }
